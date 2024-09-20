@@ -21,21 +21,35 @@ body {
 
 .color-list {
     flex: 1;
-    margin: 144px 0px 16px 16px;
+    margin: 144px 8px 16px 16px;
     display: flex;
     flex-direction: column;
+    gap: 16px;
 }
 
-.color {
+.particle-entry {
     display: flex;
+    gap: 16px;
+}
+
+button.remove {
+    font-size: 24px;
+    padding: auto;
+    border-radius: 50px;
 }
 
 .particle-name {
     flex: 1;
+    border-radius: 5px;
+    font-size: 18px;
 }
 
 .particle-color {
-    margin: 0px 20px;
+    margin-right: 10px;
+}
+
+.add-particle {
+    margin: 0 auto;
 }
 
 .center {
@@ -68,15 +82,15 @@ button {
     background-color: rgba(191, 0, 255, 0.15);
 }
 
-.color button {
-    font-size: 16px;
-}
-
 button:hover {
     box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),
                 0 17px 50px 0 rgba(0,0,0,0.19),
                 0 5px darkgray;
     background-color: rgba(255, 141, 246, 0.8);
+}
+
+button.remove:hover {
+    background-color: rgba(255, 0, 0, 0.7);
 }
 
 button.pressed:hover {

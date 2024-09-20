@@ -10,16 +10,17 @@
 <body>
     <div class="page">
         <div class="color-list">
-            <div class="color">
+            <div class="particle-entry">
+                <button class="remove">–</button>
                 <input class="particle-name" type="text" placeholder="minecraft:particle_name..." list="particles">
                 <datalist id="particles">
                     <option value="minecraft:endrod"></option>
                 </datalist>
                 <button class="particle-color">
-                    Color
-                    <input type="color" oninput="getColor()">
+                    <input class="color-picker" type="color" oninput="getColor()">
                 </button>
             </div>
+            <button class="add-particle">Add particle</button>
         </div>
         <div class="center">
             <div class="title">Particle Function Generator</div>
@@ -36,7 +37,7 @@
         let grid = document.querySelector(".grid")
         let currSquare;
         let currRow;
-        let color = document.querySelector(".color");
+        let particleColor = document.querySelector(".particle-color");
         let resize = document.querySelector(".resize");
         let erase = document.querySelector(".erase");
         let numPerSide = 15;
@@ -44,7 +45,7 @@
         let colored = false;
         let erasing = false;
         let mouseDown;
-        let colorPicker = document.querySelector(".color input");
+        let colorPicker = document.querySelector(".color-picker");
 
         function getColor()
         {
@@ -123,8 +124,8 @@
             }
         }
 
-        color.addEventListener("click", () => {
-            color.classList.toggle("pressed");
+        particleColor.addEventListener("click", () => {
+            particleColor.classList.toggle("pressed");
             if (colored == false)
                 colored = true;
             else

@@ -27,6 +27,7 @@
             <div class="buttons">
                 <button class="resize">Resize</button>
                 <button class="erase">Erase</button>
+                <button class="generate">Generate</button>
             </div>
             <div class="grid"></div>
         </div>
@@ -37,7 +38,6 @@
         let grid = document.querySelector(".grid")
         let currSquare;
         let currRow;
-        let particleColor = document.querySelector(".particle-color");
         let resize = document.querySelector(".resize");
         let erase = document.querySelector(".erase");
         let numPerSide = 15;
@@ -45,7 +45,15 @@
         let colored = false;
         let erasing = false;
         let mouseDown;
+        let colorList = document.querySelector(".color-list");
+        let particleColor = document.querySelector(".particle-color");
         let colorPicker = document.querySelector(".color-picker");
+        let addButton = document.querySelector(".add-particle");
+        let removeButton = document.querySelector(".remove");
+        let initialEntry = document.querySelector(".particle-entry")
+        let entry = initialEntry.cloneNode(true);
+        let activeColorButton;
+        let activeColor;
 
         function getColor()
         {
@@ -78,7 +86,7 @@
 
                 square.addEventListener("mouseover", () => {
 
-                    if (mouseDown && !erasing)
+                    if (mouseDown && !erasing && activeColorButton != null)
                         square.classList.add("on");
 
                     if (!mouseDown && !erasing)
@@ -102,7 +110,7 @@
 
                     mouseDown = true;
 
-                    if (!erasing)
+                    if (!erasing && activeColorButton != null)
                         square.classList.add("on");
 
                     if (erasing)
@@ -124,13 +132,45 @@
             }
         }
 
-        particleColor.addEventListener("click", () => {
-            particleColor.classList.toggle("pressed");
-            if (colored == false)
-                colored = true;
-            else
-                colored = false;
+        removeButton.addEventListener("click", () => {
+
+            initialEntry.remove();
         })
+
+        addButton.addEventListener("click", () => {
+
+            let newEntry = entry.cloneNode(true);
+
+            removeButton = newEntry.querySelector(".remove");
+
+            removeButton.addEventListener("click", () => {
+
+                newEntry.remove();
+            });
+
+            particleColor = newEntry.querySelector(".particle-color");
+            particleColor.addEventListener("click", clickParticleColor);
+
+            // Clear inputs
+            let inputs = newEntry.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.value = "";
+            });
+
+            colorList.insertBefore(newEntry, addButton);
+        })
+
+        particleColor.addEventListener("click", clickParticleColor);
+
+        function clickParticleColor(event)
+        {
+            let allColorButtons = colorList.querySelectorAll(".particle-color");
+
+            allColorButtons.forEach(btn => btn.classList.remove("pressed"));
+            activeColorButton = event.currentTarget;
+            activeColorButton.classList.add("pressed");
+            activeColor = activeColorButton.querySelector(".color-picker").value;
+        }
 
         resize.addEventListener("click", () => {
             let oldNumSide = numPerSide;

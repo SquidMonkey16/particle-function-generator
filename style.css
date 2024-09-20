@@ -46,6 +46,17 @@ button.remove {
 
 .particle-color {
     margin-right: 10px;
+    padding: 0px 20px;
+}
+
+.color-picker {
+    width: 30px;
+    height: 30px;
+    border-radius: 25px;
+}
+
+.color-picker::-webkit-color-swatch {
+    border-radius: 25px;
 }
 
 .add-particle {
@@ -70,8 +81,9 @@ button.remove {
     font-size: 36px;
 }
 
-.resize {
-    margin: 0 32px;
+.buttons {
+    display: flex;
+    gap: 30px;
 }
 
 button {
@@ -93,6 +105,10 @@ button.remove:hover {
     background-color: rgba(255, 0, 0, 0.7);
 }
 
+button.generate:hover {
+    background-color: rgba(100, 255, 100, 0.7);
+}
+
 button.pressed:hover {
     box-shadow: 0 1px darkgray;
 }
@@ -103,7 +119,7 @@ button.pressed:hover {
     background-color: rgba(255, 141, 246, 0.4);
 }
 
-.resize:active {
+button:active {
     transform: translateY(5px);
     box-shadow: 0 1px darkgray;
 }
@@ -134,7 +150,7 @@ button.pressed:hover {
 }
 
 .square.on {
-    background-color: black;
+    /* background-color: black; */
     opacity: 1;
 }
 

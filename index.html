@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Particle Function Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="page">
+        <div class="title">Particle Function Generator</div>
+        <div class="buttons">
+            <button class="color">Color</button>
+            <button class="resize">Resize</button>
+            <button class="erase">Erase</button>
+        </div>
+        <div class="grid"></div>
+    </div>
+    
+    <script>
+        let grid = document.querySelector(".grid")
+        let currSquare;
+        let currRow;
+        let color = document.querySelector(".color");
+        let resize = document.querySelector(".resize");
+        let erase = document.querySelector(".erase");
+        let numPerSide = 15;
+        let squares;
+        let colored = false;
+        let erasing = false;
+        let mouseDown;
+
+        createGrid();
+
+        function createGrid()
+        {
+            for (let i = 0; i < numPerSide; ++i)
+            {
+                currRow = document.createElement("div")
+                currRow.classList.add("row");
+                grid.appendChild(currRow);
+                for (let j = 0; j < numPerSide; ++j)
+                {
+                    currSquare = document.createElement("div");
+                    currSquare.classList.add("square");
+                    currRow.appendChild(currSquare);
+                }
+            }
+
+            squares = document.querySelectorAll(".square");
+
+            for (let i = 0; i < squares.length; ++i)
+            {
+                let square = squares[i];
+
+                square.addEventListener("mouseover", () => {
+
+                    if (mouseDown && !erasing)
+                        square.classList.add("on");
+
+                    if (!mouseDown && !erasing)
+                        square.classList.add("cursor");
+
+                    if (erasing)
+                        square.classList.add("erase-cursor");
+
+                    if (erasing && mouseDown)
+                        square.classList.remove("on");
+
+                    // if (erasing && )
+                    // {
+                    //     square.style.opacity = 1;
+                    //     square.style.border = "1px solid red";
+                    //     square.style.backgroundColor = "rgba(0, 0, 0, 0)";
+                    // }
+                    
+                    // if (square.style.opacity == 0 && !erasing)
+                    //     square.style.opacity = 0.2;
+                });
+
+                square.addEventListener("mouseleave", () => {
+
+                    square.classList.remove("cursor");
+
+                    square.classList.remove("erase-cursor");
+
+                    // if (square.style.opacity != 1)
+                    //     square.style.opacity = 0;
+
+                    // if (erasing && mouseDown)
+                    // {
+                    //     square.style.backgroundColor = "black";
+                    //     square.style.opacity = 0;
+                    // }
+
+                    // square.style.border = "1px solid lightgray";
+                });
+
+                square.addEventListener("mousedown", () => {
+
+                    mouseDown = true;
+
+                    if (!erasing)
+                        square.classList.add("on");
+
+                    if (erasing)
+                        square.classList.remove("on");
+                });
+            }
+        }
+
+        document.addEventListener("mouseup", () => {
+            
+            mouseDown = false;
+        })
+
+        function removeGrid(oldNumSide)
+        {
+            for (let i = 0; i < oldNumSide; ++i)
+            {
+                grid.removeChild(grid.lastElementChild);
+            }
+        }
+
+        color.addEventListener("click", () => {
+            color.classList.toggle("pressed");
+            if (colored == false)
+                colored = true;
+            else
+                colored = false;
+        })
+
+        resize.addEventListener("click", () => {
+            let oldNumSide = numPerSide;
+
+            numPerSide = prompt("Enter number of squares per side: (Max 100)");
+            while (numPerSide > 100 || numPerSide < 0)
+            {
+                numPerSide = prompt("Enter number of squares per side: (Max 100)");
+            }
+            
+            if (numPerSide == null || numPerSide == "" || isNaN(numPerSide))
+            {
+                numPerSide = oldNumSide;
+                return;
+            }
+
+            removeGrid(oldNumSide);
+            createGrid();
+        })
+
+        erase.addEventListener("click", () => {
+            erase.classList.toggle("pressed");
+                if (erasing == false)
+                    erasing = true;
+                else
+                    erasing = false;
+        })
+        
+    </script>
+</body>
+</html>

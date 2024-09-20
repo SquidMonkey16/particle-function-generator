@@ -5,16 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Particle Function Generator</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="particle_icon.png">
 </head>
 <body>
     <div class="page">
-        <div class="title">Particle Function Generator</div>
-        <div class="buttons">
-            <button class="color">Color</button>
-            <button class="resize">Resize</button>
-            <button class="erase">Erase</button>
+        <div class="color-list">
+            <div class="color">
+                <input class="particle-name" type="text" placeholder="minecraft:particle_name..." list="particles">
+                <datalist id="particles">
+                    <option value="minecraft:endrod"></option>
+                </datalist>
+                <button class="particle-color">
+                    Color
+                    <input type="color" oninput="getColor()">
+                </button>
+            </div>
         </div>
-        <div class="grid"></div>
+        <div class="center">
+            <div class="title">Particle Function Generator</div>
+            <div class="buttons">
+                <button class="resize">Resize</button>
+                <button class="erase">Erase</button>
+            </div>
+            <div class="grid"></div>
+        </div>
+        <div class="right"></div>
     </div>
     
     <script>
@@ -29,6 +44,13 @@
         let colored = false;
         let erasing = false;
         let mouseDown;
+        let colorPicker = document.querySelector(".color input");
+
+        function getColor()
+        {
+            pickedColor = colorPicker.value;
+            console.log(pickedColor);
+        }
 
         createGrid();
 
@@ -66,16 +88,6 @@
 
                     if (erasing && mouseDown)
                         square.classList.remove("on");
-
-                    // if (erasing && )
-                    // {
-                    //     square.style.opacity = 1;
-                    //     square.style.border = "1px solid red";
-                    //     square.style.backgroundColor = "rgba(0, 0, 0, 0)";
-                    // }
-                    
-                    // if (square.style.opacity == 0 && !erasing)
-                    //     square.style.opacity = 0.2;
                 });
 
                 square.addEventListener("mouseleave", () => {
@@ -83,17 +95,6 @@
                     square.classList.remove("cursor");
 
                     square.classList.remove("erase-cursor");
-
-                    // if (square.style.opacity != 1)
-                    //     square.style.opacity = 0;
-
-                    // if (erasing && mouseDown)
-                    // {
-                    //     square.style.backgroundColor = "black";
-                    //     square.style.opacity = 0;
-                    // }
-
-                    // square.style.border = "1px solid lightgray";
                 });
 
                 square.addEventListener("mousedown", () => {

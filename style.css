@@ -49,6 +49,10 @@ button.remove {
     padding: 0px 20px;
 }
 
+.particle-color.pressed {
+    background-color: rgba(255, 141, 246, 0.8);
+}
+
 .color-picker {
     width: 30px;
     height: 30px;
@@ -142,20 +146,22 @@ button:active {
     border: 1px solid lightgray;
     flex: 1;
     opacity: 0;
+    background-color: transparent;
 }
 
-.cursor {
+.square.cursor {
     background-color: black;
     opacity: 0.2;
 }
 
 .square.on {
-    /* background-color: black; */
+    /* border: 1px solid lime; */
     opacity: 1;
 }
 
 .erase-cursor {
     border: 4px solid red;
+    background-color: transparent;
     opacity: 1;
     margin: -3px;
     z-index: 1;

@@ -10,14 +10,14 @@
 <body>
     <div class="page">
         <div class="color-list">
-            <div class="particle-entry">
+            <div class="particle-entry" data-color="#000000" data-particle="1">
                 <button class="remove">–</button>
                 <input class="particle-name" type="text" placeholder="minecraft:particle_name..." list="particles">
                 <datalist id="particles">
                     <option value="minecraft:endrod"></option>
                 </datalist>
                 <button class="particle-color">
-                    <input class="color-picker" type="color" oninput="getColor()">
+                    <input class="color-picker" type="color" oninput="getColor(event)">
                 </button>
             </div>
             <button class="add-particle">Add particle</button>
@@ -40,9 +40,8 @@
         let currRow;
         let resize = document.querySelector(".resize");
         let erase = document.querySelector(".erase");
-        let numPerSide = 15;
+        let numPerSide = 17;
         let squares;
-        let colored = false;
         let erasing = false;
         let mouseDown;
         let colorList = document.querySelector(".color-list");
@@ -52,13 +51,26 @@
         let removeButton = document.querySelector(".remove");
         let initialEntry = document.querySelector(".particle-entry")
         let entry = initialEntry.cloneNode(true);
-        let activeColorButton;
-        let activeColor;
+        let coloring = false;
+        let selectedEntry;
+        let particleNum = 1;
 
-        function getColor()
+        function getColor(event)
         {
-            pickedColor = colorPicker.value;
-            console.log(pickedColor);
+            selectedEntry = event.target.parentNode.parentNode;
+            selectedEntry.setAttribute("data-color", event.target.value);
+            colorSquares();
+        }
+
+        function colorSquares()
+        {
+            squares.forEach(square => {
+                if (square.getAttribute("data-particle") === selectedEntry.getAttribute("data-particle"))
+                    square.style.backgroundColor = selectedEntry.getAttribute("data-color");
+                
+                if (square.classList.contains("on") && !square.hasAttribute("data-particle"))
+                    square.classList.remove("on");
+            });
         }
 
         createGrid();
@@ -86,11 +98,20 @@
 
                 square.addEventListener("mouseover", () => {
 
-                    if (mouseDown && !erasing && activeColorButton != null)
+                    if (mouseDown && !erasing && coloring)
+                    {
                         square.classList.add("on");
+                        square.style.backgroundColor = selectedEntry.getAttribute("data-color");
+                        square.setAttribute("data-particle", selectedEntry.getAttribute("data-particle"));
+                    }
 
                     if (!mouseDown && !erasing)
+                    {
                         square.classList.add("cursor");
+
+                        if (!square.classList.contains("on"))
+                            square.style.backgroundColor = "black";
+                    }
 
                     if (erasing)
                         square.classList.add("erase-cursor");
@@ -102,19 +123,28 @@
                 square.addEventListener("mouseleave", () => {
 
                     square.classList.remove("cursor");
-
                     square.classList.remove("erase-cursor");
+
+                    if (!square.classList.contains("on"))
+                            square.style.backgroundColor = "transparent";
                 });
 
                 square.addEventListener("mousedown", () => {
 
                     mouseDown = true;
 
-                    if (!erasing && activeColorButton != null)
+                    if (!erasing && coloring)
+                    {
                         square.classList.add("on");
+                        square.style.backgroundColor = selectedEntry.getAttribute("data-color");
+                        square.setAttribute("data-particle", selectedEntry.getAttribute("data-particle"));
+                    }
 
                     if (erasing)
+                    {
                         square.classList.remove("on");
+                        square.style.backgroundColor = "transparent";
+                    }
                 });
             }
         }
@@ -134,17 +164,38 @@
 
         removeButton.addEventListener("click", () => {
 
+            if (initialEntry.getAttribute("data-particle") === selectedEntry.getAttribute("data-particle"))
+                    coloring = false;
+
+            squares.forEach(square => {
+            if (square.getAttribute("data-particle") === initialEntry.getAttribute("data-particle"))
+                square.removeAttribute("data-particle");
+            });
+
+            colorSquares();
             initialEntry.remove();
-        })
+        });
 
         addButton.addEventListener("click", () => {
 
             let newEntry = entry.cloneNode(true);
 
+            particleNum++;
+            newEntry.setAttribute("data-particle", particleNum);
+
             removeButton = newEntry.querySelector(".remove");
 
             removeButton.addEventListener("click", () => {
 
+                if (newEntry.getAttribute("data-particle") === selectedEntry.getAttribute("data-particle"))
+                    coloring = false;
+
+                squares.forEach(square => {
+                    if (square.getAttribute("data-particle") === newEntry.getAttribute("data-particle"))
+                        square.removeAttribute("data-particle");
+                });
+
+                colorSquares();
                 newEntry.remove();
             });
 
@@ -167,9 +218,10 @@
             let allColorButtons = colorList.querySelectorAll(".particle-color");
 
             allColorButtons.forEach(btn => btn.classList.remove("pressed"));
-            activeColorButton = event.currentTarget;
-            activeColorButton.classList.add("pressed");
-            activeColor = activeColorButton.querySelector(".color-picker").value;
+            event.currentTarget.classList.add("pressed");
+
+            coloring = true;
+            selectedEntry = event.currentTarget.parentNode;
         }
 
         resize.addEventListener("click", () => {

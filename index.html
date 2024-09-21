@@ -27,11 +27,21 @@
             <div class="buttons">
                 <button class="resize">Resize</button>
                 <button class="erase">Erase</button>
-                <button class="generate">Generate</button>
+                <button class="generate" onclick="generateFunction()">Generate</button>
             </div>
             <div class="grid"></div>
         </div>
-        <div class="right"></div>
+        <div class="right">
+            <div>How far between each particle?</div>
+            <input class="distance" type="number" step="0.1" value="0.1" oninput="setDistance()">
+            <div>Vertical shift?</div>
+            <input class="vertical-shift" type="number" value="5" oninput="setVerticalShift()">
+        </div>
+    </div>
+    <div class="output">
+        <div class="output-title">Output</div>
+        <div class="output-box"></div>
+        <div class="tip">To run: execute as @e[relevant entities] run function funcName</div>
     </div>
     
     <script>
@@ -54,6 +64,10 @@
         let coloring = false;
         let selectedEntry;
         let particleNum = 1;
+        let output = document.querySelector(".output");
+        let outputBox = document.querySelector(".output-box");
+        let distance = 0.1;
+        let verticalShift = 5;
 
         function getColor(event)
         {
@@ -241,16 +255,42 @@
 
             removeGrid(oldNumSide);
             createGrid();
-        })
+        });
 
-        erase.addEventListener("click", () => {
+        erase.addEventListener("click", () => {    
             erase.classList.toggle("pressed");
                 if (erasing == false)
                     erasing = true;
                 else
                     erasing = false;
-        })
+        });
+
+        function setDistance()
+        {
+            distance = document.querySelector(".distance").value;
+        }
+
+        function setVerticalShift()
+        {
+            verticalShift = document.querySelector(".vertical-shift").value;
+        }
+
+        outputBox.addEventListener("click", () => {
+
+            navigator.clipboard.writeText(outputBox.textContent);
+            alert("Copied output!");
+        });
         
+        function generateFunction()
+        {   
+            output.scrollIntoView({behavior: "smooth"});
+
+            outputBox.textContent = "hello";
+
+            squares.forEach(square => {
+
+            });
+        }
     </script>
 </body>
 </html>

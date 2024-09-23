@@ -12,8 +12,9 @@
         <div class="color-list">
             <div class="particle-entry" data-color="#000000" data-particle="1">
                 <button class="remove">–</button>
-                <input class="particle-name" type="text" placeholder="minecraft:particle_name..." list="particles">
+                <input class="particle-name" type="text" placeholder="minecraft:particle_name..." list="particles" oninput="setParticleName(event)">
                 <datalist id="particles">
+                    <option value="minecraft:dragon_breath_trail"></option>
                     <option value="minecraft:endrod"></option>
                 </datalist>
                 <button class="particle-color">
@@ -35,7 +36,7 @@
             <div>How far between each particle?</div>
             <input class="distance" type="number" step="0.1" value="0.1" oninput="setDistance()">
             <div>Vertical shift?</div>
-            <input class="vertical-shift" type="number" value="5" oninput="setVerticalShift()">
+            <input class="vertical-shift" type="number" value="3.5" oninput="setVerticalShift()">
         </div>
     </div>
     <div class="output">
@@ -62,12 +63,20 @@
         let initialEntry = document.querySelector(".particle-entry")
         let entry = initialEntry.cloneNode(true);
         let coloring = false;
-        let selectedEntry;
+        let selectedEntry = initialEntry;
         let particleNum = 1;
         let output = document.querySelector(".output");
         let outputBox = document.querySelector(".output-box");
         let distance = 0.1;
-        let verticalShift = 5;
+        let verticalShift = 3.5;
+        let rowCounter;
+        let squareCounter;
+
+        function setParticleName(event)
+        {
+            selectedEntry = event.target.parentNode;
+            selectedEntry.setAttribute("data-particle-name", event.target.value);
+        }
 
         function getColor(event)
         {
@@ -91,16 +100,25 @@
 
         function createGrid()
         {
+            rowCounter = 0;
+            squareCounter = 0;
+
             for (let i = 0; i < numPerSide; ++i)
             {
                 currRow = document.createElement("div")
                 currRow.classList.add("row");
                 grid.appendChild(currRow);
+                rowCounter++;
+                squareCounter = 0;
+
                 for (let j = 0; j < numPerSide; ++j)
                 {
                     currSquare = document.createElement("div");
                     currSquare.classList.add("square");
                     currRow.appendChild(currSquare);
+                    squareCounter++;
+                    currSquare.setAttribute("data-position", squareCounter);
+                    currSquare.setAttribute("data-row", rowCounter);
                 }
             }
 
@@ -128,19 +146,24 @@
                     }
 
                     if (erasing)
+                    {
                         square.classList.add("erase-cursor");
 
+                        if (!square.classList.contains("on"))
+                            square.style.backgroundColor = "transparent";
+                    }
+
                     if (erasing && mouseDown)
+                    {
                         square.classList.remove("on");
+                        square.style.backgroundColor = "transparent";
+                    }
                 });
 
                 square.addEventListener("mouseleave", () => {
 
                     square.classList.remove("cursor");
                     square.classList.remove("erase-cursor");
-
-                    if (!square.classList.contains("on"))
-                            square.style.backgroundColor = "transparent";
                 });
 
                 square.addEventListener("mousedown", () => {
@@ -285,10 +308,23 @@
         {   
             output.scrollIntoView({behavior: "smooth"});
 
-            outputBox.textContent = "hello";
+            outputBox.replaceChildren();
 
             squares.forEach(square => {
 
+                if (square.classList.contains("on")) 
+                {
+                    let lineOutput = document.createElement("div");
+                    let squareParticleNumber = square.getAttribute("data-particle");
+                    let entryParticle = document.querySelector('.particle-entry[data-particle="' + squareParticleNumber + '"]');
+                    let entryParticleName = entryParticle.getAttribute("data-particle-name");
+                    
+                    outputBox.appendChild(lineOutput);
+                    lineOutput.textContent += "execute at @s run particle " + entryParticleName + 
+                    " ^" + 
+                    " ^" + (distance * (numPerSide - square.getAttribute("data-row")) + +verticalShift) + 
+                    " ^\n";
+                }
             });
         }
     </script>

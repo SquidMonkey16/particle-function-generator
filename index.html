@@ -318,11 +318,11 @@
                     let squareParticleNumber = square.getAttribute("data-particle");
                     let entryParticle = document.querySelector('.particle-entry[data-particle="' + squareParticleNumber + '"]');
                     let entryParticleName = entryParticle.getAttribute("data-particle-name");
-                    
+
                     outputBox.appendChild(lineOutput);
                     lineOutput.textContent += "execute at @s run particle " + entryParticleName + 
-                    " ^" + (numPerSide / 2) + 
-                    " ^" + (distance * (numPerSide - square.getAttribute("data-row")) + +verticalShift) + 
+                    " ^" + (Math.round((Math.floor(numPerSide / 2) * distance - ((numPerSide - square.getAttribute("data-position")) * distance)) * 1000) / 1000) +
+                    " ^" + (Math.round((distance * (numPerSide - square.getAttribute("data-row")) + +verticalShift) * 1000) / 1000) + 
                     " ^\n";
                 }
             });

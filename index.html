@@ -36,7 +36,16 @@
             <div>How far between each particle?</div>
             <input class="distance" type="number" step="0.1" value="0.1" oninput="setDistance()">
             <div>Vertical shift?</div>
-            <input class="vertical-shift" type="number" value="3.5" oninput="setVerticalShift()">
+            <input class="vertical-shift" type="number" value="0" oninput="setVerticalShift()">
+            <div>Orientation?</div>
+            <div class="orientation">
+                <label>
+                    <input type="radio" name="orientation" value="vertical" checked>Laid vertically
+                </label><br>
+                <label>
+                    <input type="radio" name="orientation" value="horizontal">Laid horizontally
+                </label>
+            </div>
         </div>
     </div>
     <div class="output">
@@ -68,7 +77,7 @@
         let output = document.querySelector(".output");
         let outputBox = document.querySelector(".output-box");
         let distance = 0.1;
-        let verticalShift = 3.5;
+        let verticalShift = 0;
         let rowCounter;
         let squareCounter;
 
@@ -303,9 +312,11 @@
             navigator.clipboard.writeText(outputBox.textContent);
             alert("Copied output!");
         });
-        
+
         function generateFunction()
         {   
+            let orientation = document.querySelector("input[name='orientation']:checked").value;
+
             output.scrollIntoView({behavior: "smooth"});
 
             outputBox.replaceChildren();
@@ -320,10 +331,22 @@
                     let entryParticleName = entryParticle.getAttribute("data-particle-name");
 
                     outputBox.appendChild(lineOutput);
-                    lineOutput.textContent += "execute at @s run particle " + entryParticleName + 
-                    " ^" + (Math.round((Math.floor(numPerSide / 2) * distance - ((numPerSide - square.getAttribute("data-position")) * distance)) * 1000) / 1000) +
-                    " ^" + (Math.round((distance * (numPerSide - square.getAttribute("data-row")) + +verticalShift) * 1000) / 1000) + 
-                    " ^\n";
+
+                    if (orientation == "vertical")
+                    {
+                        lineOutput.textContent += "execute at @s run particle " + entryParticleName + 
+                        " ^" + (Math.round((Math.floor(numPerSide / 2) * distance - ((numPerSide - square.getAttribute("data-position")) * distance)) * 1000) / 1000) +
+                        " ^" + (Math.round((distance * (numPerSide - square.getAttribute("data-row")) + +verticalShift) * 1000) / 1000) + 
+                        " ^\n";
+                    }
+
+                    if (orientation == "horizontal")
+                    {
+                        lineOutput.textContent += "execute at @s run particle " + entryParticleName + 
+                        " ^" + (Math.round((Math.floor(numPerSide / 2) * distance - ((numPerSide - square.getAttribute("data-position")) * distance)) * 1000) / 1000) +
+                        " ^" + verticalShift +
+                        " ^" + (Math.round((Math.floor(numPerSide / 2) * distance - ((numPerSide - square.getAttribute("data-row")) * distance)) * 1000) / 1000) + "\n";
+                    }
                 }
             });
         }

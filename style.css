@@ -91,7 +91,6 @@ button.remove {
 }
 
 .right input {
-    width: 10%;
     border-radius: 7px;
     border: 2px solid black;
     font-size: 20px;
@@ -99,8 +98,25 @@ button.remove {
     text-align: center;
 }
 
+.right input[type="number"] {
+    width: 10%;
+}
+
+.right input[type="radio"] {
+    margin: 8px 10px;
+    
+}
+
+.right label {
+    font-size: 16px;
+}
+
 .right div {
     margin-top: 20px;
+}
+
+.right .orientation {
+    margin-top: 15px;
 }
 
 .title {

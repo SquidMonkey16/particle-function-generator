@@ -350,6 +350,45 @@
                 }
             });
         }
+
+        document.addEventListener("keydown", (event) =>
+        {
+            if (event.key == "Control" || event.key == "Meta")
+                erase.click();
+
+            updateCursor();
+        })
+
+        document.addEventListener("keyup", (event) =>
+        {
+            if (event.key == "Control" || event.key == "Meta")
+                erase.click();
+
+            updateCursor();
+        })
+
+        function updateCursor()
+        {
+            let hoveredSquare = document.querySelector(".square:hover");
+
+            if (!mouseDown && !erasing)
+            {
+                hoveredSquare.classList.add("cursor");
+                hoveredSquare.classList.remove("erase-cursor");
+
+                if (!hoveredSquare.classList.contains("on"))
+                    hoveredSquare.style.backgroundColor = "black";   
+            }
+
+            if (erasing)
+            {
+                hoveredSquare.classList.add("erase-cursor");
+                hoveredSquare.classList.remove("cursor");
+
+                if (!hoveredSquare.classList.contains("on"))
+                    hoveredSquare.style.backgroundColor = "transparent";
+            }
+        }
     </script>
 </body>
 </html>

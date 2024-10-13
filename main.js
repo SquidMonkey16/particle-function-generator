@@ -271,7 +271,8 @@ function clickParticleColor(event)
 resize.addEventListener("click", () => {
     let oldNumSide = numPerSide;
 
-    numPerSide = prompt("Enter number of squares per side: (Max 100) (Current: " + numPerSide + ")");
+    numPerSide = prompt("*Note: this will clear everything\n\n" +
+                        "Enter number of squares per side: (Max 100) (Current: " + numPerSide + ")");
     while (numPerSide > 100 || numPerSide < 0)
     {
         numPerSide = prompt("Enter number of squares per side: (Max 100)");
@@ -283,7 +284,12 @@ resize.addEventListener("click", () => {
         return;
     }
 
+    camera.position.x = numPerSide * 0;
+    camera.position.y = numPerSide * 0.5 + verticalShift;
+    camera.position.z = numPerSide * 0.8;
+
     removeGrid(oldNumSide);
+    removeAllCubes();
     createGrid();
 });
 

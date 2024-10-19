@@ -2,7 +2,6 @@ import * as THREE from 'three';
 
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-let grid = document.querySelector(".grid")
 let currSquare;
 let currRow;
 let resize = document.querySelector(".resize");
@@ -20,6 +19,7 @@ let removeButton = document.querySelector(".remove");
 let initialEntry = document.querySelector(".particle-entry")
 let entry = initialEntry.cloneNode(true);
 let coloring = false;
+let layerSelected = false;
 let selectedEntry = initialEntry;
 let particleNum = 1;
 let output = document.querySelector(".output");
@@ -29,6 +29,9 @@ let verticalShift = 0;
 let rowCounter;
 let squareCounter;
 let model3d = document.querySelector(".model-3d");
+let fullRenderer = document.querySelector(".full-renderer");
+let layerCount = 0;
+const addLayerButton = document.querySelector(".add-layer");
 
 particleName.addEventListener("input", setParticleName);
 
@@ -72,10 +75,18 @@ function colorCubes()
     })
 }
 
-createGrid();
+function getSelectedGrid()
+{
+    return document.querySelector(".selected-grid");
+}
 
 function createGrid()
 {
+    let newGrid = document.createElement("div");
+    newGrid.classList.add("grid");
+    newGrid.setAttribute("data-layer", layerCount);
+    document.querySelector(".center").appendChild(newGrid);
+
     rowCounter = 0;
     squareCounter = 0;
 
@@ -83,7 +94,7 @@ function createGrid()
     {
         currRow = document.createElement("div")
         currRow.classList.add("row");
-        grid.appendChild(currRow);
+        newGrid.appendChild(currRow);
         rowCounter++;
         squareCounter = 0;
 
@@ -95,6 +106,7 @@ function createGrid()
             squareCounter++;
             currSquare.setAttribute("data-position", squareCounter);
             currSquare.setAttribute("data-row", rowCounter);
+            currSquare.setAttribute("data-layer", layerCount);
         }
     }
 
@@ -106,13 +118,17 @@ function createGrid()
 
         square.addEventListener("mouseover", () => {
 
-            if (mouseDown && !erasing && coloring)
+            if (mouseDown && !erasing && coloring && layerSelected)
             {
-                square.classList.add("on");
                 square.style.backgroundColor = selectedEntry.getAttribute("data-color");
                 square.setAttribute("data-particle", selectedEntry.getAttribute("data-particle"));
+                
+                if (square.classList.contains("on"))
+                    recolorCube(square);
+                else
+                    addCube(square);
 
-                addCube(square);
+                square.classList.add("on");
             }
 
             if (!mouseDown && !erasing)
@@ -150,13 +166,17 @@ function createGrid()
 
             mouseDown = true;
 
-            if (!erasing && coloring)
+            if (!erasing && coloring && layerSelected)
             {
-                square.classList.add("on");
                 square.style.backgroundColor = selectedEntry.getAttribute("data-color");
                 square.setAttribute("data-particle", selectedEntry.getAttribute("data-particle"));
+                
+                if (square.classList.contains("on"))
+                    recolorCube(square);
+                else
+                    addCube(square);
 
-                addCube(square);
+                square.classList.add("on");
             }
 
             if (erasing)
@@ -175,12 +195,18 @@ document.addEventListener("mouseup", () => {
     mouseDown = false;
 })
 
-function removeGrid(oldNumSide)
+function removeAllGrids()
 {
-    for (let i = 0; i < oldNumSide; ++i)
-    {
-        grid.removeChild(grid.lastElementChild);
-    }
+    document.querySelectorAll(".grid").forEach(grid => {grid.remove();});
+}
+
+function removeAllLayers()
+{
+    document.querySelectorAll(".layer").forEach(layer => {
+
+        layer.remove();
+        layerCount--;
+    });
 }
 
 removeButton.addEventListener("click", () => {
@@ -288,9 +314,13 @@ resize.addEventListener("click", () => {
     camera.position.y = numPerSide * 0.5 + verticalShift;
     camera.position.z = numPerSide * 0.8;
 
-    removeGrid(oldNumSide);
+    removeAllGrids();
     removeAllCubes();
-    createGrid();
+
+    removeAllLayers();
+    createLayer();
+    document.querySelector(".layer").click();
+    hideAllButSelectedGrid();
 });
 
 erase.addEventListener("click", () => {    
@@ -332,6 +362,9 @@ document.querySelectorAll("input[name='orientation']").forEach(input => {
     input.addEventListener("input", () => {
 
         refreshAllCubes();
+
+        if (document.querySelector("#hide-unfocused").checked)
+            hideUnfocusedCubes();
     });
 });
 
@@ -351,7 +384,7 @@ function generateFunction()
 
     outputBox.replaceChildren();
 
-    squares.forEach(square => {
+    document.querySelectorAll(".square").forEach(square => {
 
         if (square.classList.contains("on")) 
         {
@@ -367,14 +400,14 @@ function generateFunction()
                 lineOutput.textContent += "execute at @s run particle " + entryParticleName + 
                 " ^" + (Math.round((Math.floor(numPerSide / 2) * distance - ((numPerSide - square.getAttribute("data-position")) * distance)) * 1000) / 1000) +
                 " ^" + (Math.round((distance * (numPerSide - square.getAttribute("data-row")) + verticalShift) * 1000) / 1000) + 
-                " ^\n";
+                " ^" + (-(+square.getAttribute("data-layer") - (layerCount / 2) - 0.5) * distance) + "\n";
             }
 
             if (orientation == "horizontal")
             {
                 lineOutput.textContent += "execute at @s run particle " + entryParticleName + 
                 " ^" + (Math.round((Math.floor(numPerSide / 2) * distance - ((numPerSide - square.getAttribute("data-position")) * distance)) * 1000) / 1000) +
-                " ^" + verticalShift +
+                " ^" + (verticalShift + ((+square.getAttribute("data-layer") - 1) * distance)) +
                 " ^" + (Math.round((Math.floor(numPerSide / 2) * distance - ((numPerSide - square.getAttribute("data-row")) * distance)) * 1000) / 1000) + "\n";
             }
         }
@@ -420,6 +453,238 @@ function updateCursor()
     }
 }
 
+function createLayer()
+{
+    const layer = document.createElement("div");
+    layer.classList.add("layer");
+    layerCount++;
+    layer.setAttribute("data-layer", layerCount);
+    
+    const layerText = document.createElement("div");
+    layerText.classList.add("layer-text");
+    layerText.textContent = "Layer " + layerCount;
+    layer.appendChild(layerText);
+
+    layer.addEventListener("click", (event) => {
+
+        if (event.target.nodeName != "BUTTON")
+            setSelectedLayer(event);
+    });
+
+    createRemoveLayerButton(layer);
+
+    document.querySelector(".layers-list").insertBefore(layer, addLayerButton);
+
+    createGrid();
+    hideAllButSelectedGrid();
+    refreshAllCubes();
+}
+
+function createRemoveLayerButton(layer)
+{
+    const removeLayerButton = document.createElement("button");
+    removeLayerButton.classList.add("remove-layer");
+    removeLayerButton.textContent = "–";
+
+    removeLayerButton.addEventListener("click", removeLayer);
+
+    layer.insertBefore(removeLayerButton, layer.firstChild)
+}
+
+function removeCorrespondingGrid(event)
+{
+    document.querySelector('.grid[data-layer="' + event.target.parentNode.getAttribute("data-layer") + '"]').remove();
+}
+
+function closeGapBetweenCubes(event)
+{
+    scene.children.forEach(child => {
+
+        if (isCube(child) && +child.userData.layer > +event.target.parentNode.getAttribute("data-layer"))
+            child.userData.layer--;
+    });
+}
+
+function closeGapBetweenSquaresAndLayers(event)
+{
+    document.querySelectorAll("*").forEach(child => {
+
+        if (+child.getAttribute("data-layer") > +event.target.parentNode.getAttribute("data-layer"))
+            child.setAttribute("data-layer", +child.getAttribute("data-layer") - 1);
+    });
+}
+
+function removeLayer(event)
+{
+    removeCorrespondingGrid(event);
+    closeGapBetweenCubes(event);
+    closeGapBetweenSquaresAndLayers(event);
+
+    // If removing the layer that was selected
+    if (event.target.parentNode.classList.contains("selected-layer"))
+    {
+        document.querySelector(".layers-top").textContent = "Layers";
+        layerSelected = false;
+    }
+
+    removeParent(event.target);
+    layerCount--;
+
+    renumberLayers();
+    refreshAllCubes();
+}
+
+function removeParent(child)
+{
+    child.parentNode.parentNode.removeChild(child.parentNode);
+}
+
+function getAllLayerTexts()
+{
+    return document.querySelectorAll(".layer-text");
+}
+
+function renumberLayers()
+{
+    let layerTexts = getAllLayerTexts();
+    let layerNumber = 0;
+
+    layerTexts.forEach(layerText => {
+
+        layerText.textContent = layerText.textContent.slice(0, 6);
+        layerNumber++;
+        layerText.textContent += layerNumber;
+    })
+}
+
+function setSelectedGrid(event)
+{
+    if (getSelectedGrid() != null)
+        getSelectedGrid().classList.remove("selected-grid");
+
+    document.querySelectorAll(".grid").forEach(grid => {
+        if (grid.getAttribute("data-layer") === event.currentTarget.getAttribute("data-layer"))
+            grid.classList.add("selected-grid");
+    });
+}
+
+addLayerButton.addEventListener("click", createLayer);
+
+function getSelectedLayer()
+{
+    return document.querySelector(".selected-layer");
+}
+
+function setSelectedLayer(event)
+{   
+    setSelectedGrid(event);
+    hideAllButSelectedGrid();
+
+    // If clicking selected layer, turn off
+    if (event.currentTarget.classList.contains("selected-layer"))
+    {
+        event.currentTarget.classList.remove("selected-layer");
+        layerSelected = false;
+        document.querySelector(".layers-top").textContent = "Layers";
+    }
+    // If clicking non-selected layer, turn on
+    else
+    {
+        if (getSelectedLayer() != null)
+            getSelectedLayer().classList.remove("selected-layer");
+
+        event.currentTarget.classList.add("selected-layer");
+        layerSelected = true;
+        document.querySelector(".layers-top").textContent = getSelectedLayer().textContent.slice(1);
+    }
+
+    if (document.querySelector("#hide-unfocused").checked)
+        hideUnfocusedCubes();
+}
+
+document.querySelector("#hide-unfocused").addEventListener("click", (event) => {
+
+    if (event.target.checked)
+        hideUnfocusedCubes();
+    else
+    {
+        setAllCubeOpacity(1);
+        setAllEdgeOpacity(1);
+    }
+});
+
+function hideUnfocusedCubes()
+{
+    setAllCubeOpacity(0);
+    setAllEdgeOpacity(0.1);
+    setSelectedCubeOpacity(1);
+    setSelectedEdgeOpacity(1);
+
+    if (document.querySelector(".selected-layer") === null)
+    {
+        setAllCubeOpacity(1);
+        setAllEdgeOpacity(1);
+    }
+}
+
+function setAllCubeOpacity(value)
+{
+    scene.children.forEach(child => {
+
+        if (isCube(child))
+            child.material.opacity = value;
+    });
+}
+
+function setAllEdgeOpacity(value)
+{
+    scene.children.forEach(child => {
+
+        if (isEdge(child))
+            child.material.opacity = value;
+    });
+}
+
+function setSelectedCubeOpacity(value)
+{
+    if (getSelectedLayer() != null)
+    {
+        scene.children.forEach(child => {
+    
+            if (isCube(child) && child.userData.layer === getSelectedLayer().getAttribute("data-layer"))
+                child.material.opacity = value;
+        });
+    }
+}
+
+function setSelectedEdgeOpacity(value)
+{
+    if (getSelectedLayer() != null)
+    {
+        scene.children.forEach(child => {
+    
+            if (isEdge(child) && child.parent.userData.layer === getSelectedLayer().getAttribute("data-layer"))
+                child.material.opacity = value;
+        });
+    }
+}
+
+function hideAllButSelectedGrid()
+{
+    hideAllGrids();
+
+    if (getSelectedGrid() != null)
+        getSelectedGrid().classList.remove("hidden");
+}
+
+function hideAllGrids()
+{
+    document.querySelectorAll(".grid").forEach(grid => {
+
+        grid.classList.add("hidden");
+    });
+}
+
 // Three.js starts here
 
 const scene = new THREE.Scene();
@@ -431,6 +696,11 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize( model3d.clientWidth, model3d.clientHeight );
 renderer.setAnimationLoop( animate );
 model3d.appendChild( renderer.domElement );
+
+const renderer2 = new THREE.WebGLRenderer();
+renderer2.setSize( fullRenderer.clientWidth, fullRenderer.clientHeight );
+renderer2.setAnimationLoop( animate );
+fullRenderer.appendChild( renderer2.domElement );
 
 camera.position.x = numPerSide * 0;
 camera.position.y = numPerSide * 0.5 + verticalShift;
@@ -444,12 +714,14 @@ const gridHelper = new THREE.GridHelper(200, 50);
 scene.add(gridHelper);
 
 const controls = new OrbitControls(camera, renderer.domElement);
+const controls2 = new OrbitControls(camera, renderer2.domElement);
 
 function animate() {
 
     let orientation = document.querySelector("input[name='orientation']:checked").value;
 
     controls.update();
+    controls2.update();
 
     if (orientation == "vertical")
     {
@@ -464,12 +736,33 @@ function animate() {
     {
         camera.lookAt(
             0,
-            verticalShift,
+            verticalShift + (layerCount / 2),
             0
         );
     }
 
 	renderer.render( scene, camera );
+    renderer2.render( scene, camera );
+}
+
+function recolorCube(square)
+{
+    scene.children.forEach(child => {
+
+        if (isCube(child) &&
+            child.userData.row === square.getAttribute("data-row") &&
+            child.userData.position === square.getAttribute("data-position") &&
+            child.userData.layer === square.getAttribute("data-layer"))
+        {
+            child.material.color.set(square.style.backgroundColor);
+            renumberCubeParticle(child, square);
+        }
+    });
+}
+
+function renumberCubeParticle(cube, square)
+{
+    cube.userData.particleNum = square.getAttribute("data-particle");
 }
 
 function addCube(square)
@@ -479,14 +772,14 @@ function addCube(square)
     // Add cube
     const cube = new THREE.Mesh(
         new THREE.BoxGeometry( 1, 1, 1 ),
-        new THREE.MeshStandardMaterial({ color: cubeColor })
+        new THREE.MeshStandardMaterial({ color: cubeColor, transparent: true, opacity: 1 })
     );
     scene.add(cube);
 
     // Add outlines to cube
     const outlines = new THREE.LineSegments(
         new THREE.EdgesGeometry(cube.geometry),
-        new THREE.LineBasicMaterial({ color: 0x000000 }) // Black color for the outlines
+        new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, opacity: 1 }) // Black color for the outlines
     );
     cube.add(outlines);
 
@@ -495,7 +788,8 @@ function addCube(square)
     cube.userData = {
         particleNum: selectedEntry.getAttribute("data-particle"),
         row: square.getAttribute("data-row"),
-        position: square.getAttribute("data-position")
+        position: square.getAttribute("data-position"),
+        layer: square.getAttribute("data-layer")
     };
 }
 
@@ -505,7 +799,8 @@ function removeCube(square)
 
         if (isCube(child) &&
             child.userData.row === square.getAttribute("data-row") &&
-            child.userData.position === square.getAttribute("data-position"))
+            child.userData.position === square.getAttribute("data-position") &&
+            child.userData.layer === square.getAttribute("data-layer"))
         {
             scene.remove(child);
             child.geometry.dispose();
@@ -519,13 +814,18 @@ function isCube(object)
     return object instanceof THREE.Mesh && object.geometry instanceof THREE.BoxGeometry;
 }
 
+function isEdge(object)
+{
+    return object instanceof THREE.LineSegments && object.geometry instanceof THREE.EdgesGeometry;
+}
+
 function refreshAllCubes()
 {
     // Remove all old cubes
     removeAllCubes();
 
     // Add all new cubes
-    squares.forEach(square => {
+    document.querySelectorAll(".square").forEach(square => {
 
         if (square.classList.contains("on")) 
             addCube(square);
@@ -557,7 +857,7 @@ function setCubePosition(square, cube)
         cube.position.set(
             (Math.round((Math.floor(numPerSide / 2) - ((numPerSide - square.getAttribute("data-position")))) * 1000) / 1000),
             (Math.round((numPerSide - square.getAttribute("data-row") + verticalShift) * 1000) / 1000) + 0.5,
-            0
+            -(+square.getAttribute("data-layer") - (layerCount / 2) - 0.5)
         );
     }
 
@@ -566,8 +866,14 @@ function setCubePosition(square, cube)
     {
         cube.position.set(
             (Math.round((Math.floor(numPerSide / 2) - (numPerSide - square.getAttribute("data-position"))) * 1000) / 1000),
-            verticalShift,
+            verticalShift + +square.getAttribute("data-layer") - 0.5,
             (Math.round((Math.floor(numPerSide / 2) - (numPerSide - square.getAttribute("data-row"))) * 1000) / 1000)
         );
     }
 }
+
+// End three.js
+
+createLayer();
+document.querySelector(".layer").click();
+hideAllButSelectedGrid();

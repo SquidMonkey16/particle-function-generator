@@ -1,5 +1,5 @@
-# Particle Function Generator
-This program lets you convert a drawing into a function of minecraft particle commands. For every square you color, a particle command will be created.
+# Particle Function Generator (Bedrock)
+This program lets you convert a drawing into a function of Minecraft particle commands for Bedrock Edition. For every square you color, a particle command will be created.
 
 ![Function Generation Example](funcGenerationExample.gif)
 

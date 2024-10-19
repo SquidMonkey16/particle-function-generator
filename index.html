@@ -39,7 +39,6 @@
                 <button class="erase">Erase</button>
                 <button class="generate">Generate</button>
             </div>
-            <div class="grid"></div>
         </div>
         <div class="right">
             <div>How far between each particle?</div>
@@ -49,14 +48,28 @@
             <div>Orientation?</div>
             <div class="orientation">
                 <label>
-                    <input type="radio" name="orientation" value="vertical" checked>Laid vertically
+                    <input type="radio" name="orientation" value="vertical" checked>Vertical layers
                 </label><br>
                 <label>
-                    <input type="radio" name="orientation" value="horizontal">Laid horizontally
+                    <input type="radio" name="orientation" value="horizontal">Horizontal layers
                 </label>
             </div>
             <div class="model-3d"></div>
         </div>
+    </div>
+    <div class="fullscreen-model">
+        <div class="layers-sidebar">
+            <div class="layers-top">Layers</div>
+            <div class="layers-list">
+                <button class="add-layer">+</button>
+            </div>
+            <div class="layers-bottom">
+                <label>
+                    <input type="checkbox" id="hide-unfocused" checked>Hide unfocused cubes
+                </label>
+            </div>
+        </div>
+        <div class="full-renderer"></div>
     </div>
     <div class="output">
         <div class="output-title">Output</div>

@@ -21,10 +21,12 @@ body {
 
 .color-list {
     flex: 1;
-    margin: 86px 8px 16px 16px;
+    margin: 74px 0px 16px 0px;
     display: flex;
     flex-direction: column;
+    padding: 12px 12px 0 24px;
     gap: 16px;
+    overflow: scroll;
 }
 
 .particle-entry {
@@ -71,8 +73,9 @@ button.remove {
     flex-direction: column;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: left;
     align-items: center;
+    margin-top: 26px;
     gap: 16px;
     flex: 1;
 }
@@ -184,6 +187,10 @@ button:active {
     background-color: rgba(191, 0, 255, 0.15);
 }
 
+.hidden {
+    display: none;
+}
+
 .row {
     display: flex;
     flex: 1;
@@ -212,6 +219,117 @@ button:active {
     opacity: 1;
     margin: -3px;
     z-index: 1;
+}
+
+.fullscreen-model {
+    /* display: none; */
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(191, 0, 255, 0.15);
+}
+
+.layers-sidebar {
+    width: 11vw;
+    margin: 48px 0 32px 130px;
+    justify-content: left;
+    align-items: stretch;
+    border: 4px solid black;
+    border-right: none;
+    border-top-left-radius: 25px;
+    border-bottom-left-radius: 25px;
+    background-color: rgba(244, 210, 255, 0.5);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.layers-top {
+    border-bottom: 3px solid black;
+    background-color: rgba(191, 0, 255, 0.2);
+    text-align: center;
+    padding: 8px;
+}
+
+.layers-list {
+    overflow: scroll;
+}
+
+.layers-bottom {
+    border-top: 3px solid black;
+    margin-top: auto;
+    min-height: 12%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.layers-bottom label {
+    display: flex;
+    gap: 6px;
+    margin-left: 4px;
+    font-size: 17px;
+}
+
+.layer {
+    border-bottom: 2px solid black;
+    font-size: 18px;
+    padding: 4px;
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    gap: 24px;
+}
+
+.layer-text {
+    font-size: 18px;
+}
+
+.selected-layer {
+    background-color: rgba(255, 141, 246, 0.5);
+}
+
+.layer:hover {
+    background-color: rgba(255, 141, 246, 0.8);
+}
+
+.remove-layer {
+    height: 24px;
+    padding: 0 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px darkgray;
+}
+
+.remove-layer:hover {
+    background-color: rgba(255, 0, 0, 0.5);
+}
+
+.add-layer {
+    margin-top: 10px;
+    margin-left: 54px;
+    margin-bottom: 60px;
+    width: 48px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.full-renderer {
+    border: 4px solid black;
+    width: 65vw;
+    margin: 48px 100px 32px 0;
+    justify-content: center;
+    align-items: center;
+    border-top-right-radius: 25px;
+    border-bottom-right-radius: 25px;
+}
+
+.full-renderer canvas {
+    border-top-right-radius: 25px;
+    border-bottom-right-radius: 25px;
 }
 
 .output {
